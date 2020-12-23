@@ -15,51 +15,23 @@ class myUser(models.Model):
     profile_picture = models.ImageField(default = "avatars/profile1.png", upload_to = 'avatars', null = True, blank = True)
     date_created = models.DateTimeField(auto_now_add = True, null = True)
 
-    class Meta:
-        permissions = (
-            ("view_home_page", "Permission to view the home page"),
-            ("view_profile_page", "Permission to view the profile page"),
-        )
-
     def __str__(self):
         return str(self.name)
 
 class Parent(models.Model):
     user = models.OneToOneField(myUser, null = True, on_delete = models.CASCADE)
 
-    class Meta:
-        permissions = (
-            ("view_travel_page", "Permission to view the travel page"),
-            ("view_schedule_page", "Permission to view the schedule page"),
-            ("view_memories_page", "Permission to view the memories page"),
-            ("view_home_page", "Permission to view the home page"),
-            ("view_profile_page", "Permission to view the profile page"),
-        )
+    def __str__(self):
+        return self.user.name
 
 class Child(models.Model):
     user = models.OneToOneField(myUser, null = True, on_delete = models.CASCADE)
-
-    class Meta:
-        permissions = (
-            ("view_travel_page", "Permission to view the travel page"),
-            ("view_schedule_page", "Permission to view the schedule page"),
-            ("view_memories_page", "Permission to view the memories page"),
-            ("view_home_page", "Permission to view the home page"),
-            ("view_profile_page", "Permission to view the profile page"),
-        )
 
     def __str__(self):
         return self.user.name
 
 class External(models.Model):
     user = models.OneToOneField(myUser, null = True, on_delete = models.CASCADE)
-
-    class Meta:
-        permissions = (
-            ("view_schedule_page", "Permission to view the schedule page"),
-            ("view_home_page", "Permission to view the home page"),
-            ("view_profile_page", "Permission to view the profile page"),
-        )
 
     def __str__(self):
         return self.user.name
@@ -112,16 +84,34 @@ class Measurement(models.Model):
     distance = models.DecimalField(max_digits=10, decimal_places=2)
     created = models.DateTimeField(auto_now_add=True)
 
+
     def __str__(self):
         return f"Distance from {self.location} to {self.destination} is {self.distance} km"
 
 class Event(models.Model):
+
+    CATEGORY = (
+        ('Urgent', 'Urgent'),
+        ('Important', 'Important'),
+        ('Can be delayed', 'Can be delayed'),
+        ('Unimportant', 'Unimportant'),
+    )
+
     title = models.CharField(max_length=200, null=True)
+    person_in_charge = models.ForeignKey(myUser, null = True, default = None, on_delete = models.CASCADE)
     description = models.TextField(null=True)
     start_time = models.DateTimeField(null=True)
     end_time = models.DateTimeField(null=True)
+    importance = models.CharField(max_length=200, null=True, choices = CATEGORY)
 
     @property
     def get_html_url(self):
         url = reverse('event_edit', args=(self.id,))
-        return f'<a href="{url}"> {self.title} </a>'
+        if self.importance == "Important":
+            return f'<a href="{url}" style="color:#EB0C2E; font-weight:bold; text-decoration: none;"> {self.title} - {self.person_in_charge.name}</a>'
+        if self.importance == "Urgent":
+            return f'<a href="{url}" style="color:#D90A9D; font-weight:bold; text-decoration: none;"> {self.title} - {self.person_in_charge.name}</a>'
+        if self.importance == "Can be delayed":
+            return f'<a href="{url}" style="color:#46791E; font-weight:bold; text-decoration: none;"> {self.title} - {self.person_in_charge.name}</a>'
+        if self.importance == "Unimportant":
+            return f'<a href="{url}" style="color:#1C15DC; font-weight:bold; text-decoration: none;"> {self.title} - {self.person_in_charge.name}</a>'

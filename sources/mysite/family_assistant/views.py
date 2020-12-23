@@ -121,6 +121,7 @@ def uploadImage(request):
     return render(request, 'memories_templates/upload_memory.html', {'form':form})
 
 @login_required
+@group_required('Parent', 'Child')
 def removeImage(request, pk):
     image = Image.objects.get(id = pk)
     if request.method == 'POST':
@@ -130,6 +131,7 @@ def removeImage(request, pk):
     return render(request, 'memories_templates/delete_memory.html', context)
 
 @login_required
+@group_required('Parent', 'Child')
 def updateMemory(request, pk):
     get_image = Image.objects.get(id = pk)
     form = CreateImageForm(instance = get_image)
@@ -140,6 +142,8 @@ def updateMemory(request, pk):
     context = {'form':form}
     return render(request, 'memories_templates/modify_memory.html', context)
 
+@login_required
+@group_required('Parent', 'Child')
 def addComment(request, pk):
     comments = ImageComment.objects.all()
     get_image = Image.objects.get(id = pk)
@@ -151,7 +155,8 @@ def addComment(request, pk):
         new_comment = ImageComment.objects.create(author = author, image = get_image, text = text)
         form = AddCommentForm(request.POST, request.FILES, instance = new_comment)
         if form.is_valid():
-            form.save()
+            form.save()            
+            return redirect(request.path_info)
     image_comments = ImageComment.objects.all()
     context = {'form':form, 'image':get_image, 'comments':image_comments}
     return render(request, 'memories_templates/add_comment.html', context)
@@ -165,6 +170,8 @@ def addComment(request, pk):
 
 ####### PERSONAL LISTS #########
 
+@login_required
+@group_required('Parent', 'Child')
 def addItem(request, pk):
     user_to_get = request.user
     get_user = myUser.objects.get(user = user_to_get)
@@ -183,13 +190,16 @@ def addItem(request, pk):
     context = {'form':form, 'child_objects':child_objects}
     return render(request, 'lists_templates/add_child_item.html', context)
 
+@login_required
+@group_required('Parent', 'Child')
 def viewItems(request, pk):
     user_to_get = request.user
     get_user = myUser.objects.get(user = user_to_get)
     items = Child_Item.objects.all()
     return render(request, 'lists_templates/render_items.html', {'user':get_user, 'items':items})
 
-
+@login_required
+@group_required('Parent', 'Child')
 def removeItem(request, pk):
     item = Child_Item.objects.get(id = pk)
     if request.method == 'POST':
@@ -202,6 +212,8 @@ def removeItem(request, pk):
 
 ######### TRAVEL PAGE ###########
 
+@login_required
+@group_required('Parent', 'Child')
 def calculate_distance_view(request):
 
     # initial values
@@ -269,6 +281,8 @@ def calculate_distance_view(request):
 
     return render(request, 'travel_templates/travel_add.html', context)
 
+@login_required
+@group_required('Parent')
 def removeTravel(request, pk):
     travel = Measurement.objects.get(id = pk)
     if request.method == 'POST':
@@ -301,11 +315,13 @@ class CalendarView(generic.ListView):
         context['next_month'] = next_month(d)
         return context
 
+
 def prev_month(d):
     first = d.replace(day=1)
     prev_month = first - timedelta(days=1)
     month = 'month=' + str(prev_month.year) + '-' + str(prev_month.month)
     return month
+
 
 def next_month(d):
     days_in_month = calendar.monthrange(d.year, d.month)[1]
@@ -314,11 +330,15 @@ def next_month(d):
     month = 'month=' + str(next_month.year) + '-' + str(next_month.month)
     return month
 
+
 def get_date(req_day):
     if req_day:
         year, month = (int(x) for x in req_day.split('-'))
         return date(year, month, day=1)
     return datetime.today()
+
+@login_required
+@group_required('Parent', 'Child', 'External')
 
 def event(request, event_id=None):
     instance = Event()
