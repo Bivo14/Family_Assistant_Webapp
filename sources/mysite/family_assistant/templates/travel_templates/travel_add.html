@@ -1,0 +1,78 @@
+{% extends 'base_templates/base_travel.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+calculate distance
+{% endblock title %}
+
+{% block content %}
+
+<style>
+  .harta{
+    margin-top: 20px;
+    margin-left: 120px;
+    display: flex;
+    align-items: center;
+  }
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Distance to {{ destination }} is:</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {{ distance }} km
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class = "harta">
+  <p style="text-align:center">
+  {{ map|safe }}
+  </p>
+</div>
+
+<div class = "formular">
+  <form action="" method="POST" autocomplete="off">
+      {% csrf_token %}
+      {{form|crispy}}
+      <button type="submit" class="btn btn-primary">confirm</button>
+  </form>
+</div>
+<br>
+
+
+{% if request.POST and distance is not None %}
+    <script>
+        $(window).on('load', function(){
+            $('#exampleModal').modal('show')
+        })
+    </script>
+{% endif %}
+
+<div class="list-group">
+
+  {% for travel in travels %}
+      <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{travel.id}}</h5>
+          </div>
+          <p class="mb-1">{{travel.location}}</p>
+          <p class="mb-1">{{travel.destination}}</p>
+          <small class="text-muted">{{travel.distance}}</small>
+          <a href="{% url 'delete_travel' travel.id %}" class = "btn btn-danger" role = "button" id = "delete-travel">Delete Item</a>
+        </a>
+  {% endfor %}
+</div>
+
+This product includes GeoLite2 data created by MaxMind, available from
+<a href="https://www.maxmind.com">https://www.maxmind.com</a>.
+
+{% endblock content %}

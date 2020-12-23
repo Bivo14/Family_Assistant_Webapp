@@ -1,0 +1,44 @@
+{% extends 'base_templates/index_template.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<style>
+  .row {
+    margin: 0 auto;
+  }
+</style>
+
+<br>
+<div class="row">
+	<div class="col-md-5">
+		<div class="card card-body">
+			<a class="btn btn-warning" href="{% url 'memories' %}"> &#8592; Back to Memories</a>
+      <hr>
+      <div class="memory-image">
+        <img class="card-img-top" src="{{ image.image.url }}" alt="Card image cap" width="640px" height="480px">
+      </div>
+      <hr>
+			<h3 style="text-align: center">Previous comments</h3>
+      <hr>
+      {% for c in comments %}
+        {% if c.image.id == image.id %}
+        <div>
+          <b>{{c.author}} ({{c.date_created}}):</b>
+          {{c.text}}
+        </div>
+        {% endif %}
+      {% endfor %}
+		</div>
+	</div>
+
+<div class="col-md-5">
+  <div class="card card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{form|crispy}}
+      <button type="submit" class="btn btn-info">Comment</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

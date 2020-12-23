@@ -1,0 +1,32 @@
+{% extends 'base_templates/index_template.html' %}
+
+{% block content %}
+  <style>
+    .container-fluid {
+      margin-top: 10px;
+    }
+  </style>
+
+  <header><p style="text-align:center"><a href="{% url 'upload_memory' %}" class = "btn btn-primary" role = "button" id = "upload-memory">Upload memory</a></p></header>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+  <div class="container-fluid">    
+    <div class="row">
+      {% for image in images %}
+        <div class="col-lg-2 col-md-3 col-6" style="margin-bottom:10px;">
+          <div class="card" style="width: 18rem; display:inline-block">
+            <img class="card-img-top" src="{{ image.image.url }}" alt="Card image cap" width="382px" height="180px">
+            <div class="card-body">
+              <p style="text-align:center"><b>{{image.title}}</b></p>
+              <p class="card-text">{{image.description}}</p>
+              <p style="text-align:center"><a href="{% url 'update_memory' image.id %}" class = "btn btn-warning" role = "button" id = "update-memory">Update memory</a></p>
+              <p style="text-align:center"><a href="{% url 'delete_memory' image.id %}" class = "btn btn-danger" role = "button" id = "delete-memory">Delete memory</a></p>
+              <p style="text-align:center"><a href="{% url 'comment_to_memory' image.id %}" class = "btn btn-info" role = "button" id = "delete-memory">Add comment</a></p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
