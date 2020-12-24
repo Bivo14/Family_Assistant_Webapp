@@ -66,8 +66,22 @@ calculate distance
           </div>
           <p class="mb-1">{{travel.location}}</p>
           <p class="mb-1">{{travel.destination}}</p>
-          <small class="text-muted">{{travel.distance}}</small>
-          <a href="{% url 'delete_travel' travel.id %}" class = "btn btn-danger" role = "button" id = "delete-travel">Delete Item</a>
+          <p class="mb-1">Din {{travel.start_time}} pana pe {{travel.end_time}}</p>
+          <small class="text-muted">{{travel.distance}} km</small>
+
+          <hr>
+
+          <form action="{% url 'vote_travel' travel.id %}" method = "POST">
+            {% csrf_token %}
+            <button type="submit", name="vote_button", value="{{travel.id}}", class="btn btn-primary btn-sm">Vote</button>
+            {{travel.votes.count}} vote(s)
+          </form>
+
+
+          {% if request.user.is_superuser %}
+            <a href="{% url 'delete_travel' travel.id %}" class = "btn btn-danger" role = "button" id = "delete-travel">Delete Item</a>
+          {% endif %}
+
         </a>
   {% endfor %}
 </div>

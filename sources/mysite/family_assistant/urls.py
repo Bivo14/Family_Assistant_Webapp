@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views 
+from . import views
 
 urlpatterns = [
     path('', views.homePage, name="home"),
@@ -23,6 +23,7 @@ urlpatterns = [
 
     path('travel/', views.calculate_distance_view, name="travel"),
     path('delete_travel/<str:pk>', views.removeTravel, name="delete_travel"),
+    path('vote_travel/<str:pk>', views.VoteView, name="vote_travel"),
 
     path('schedule/', views.CalendarView.as_view(), name="schedule"),
     path('event/new/', views.event, name='event_new'),

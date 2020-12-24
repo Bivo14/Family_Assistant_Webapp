@@ -21,11 +21,22 @@ class myUser(models.Model):
 class Parent(models.Model):
     user = models.OneToOneField(myUser, null = True, on_delete = models.CASCADE)
 
+    class Meta:
+        permissions = (
+            ('can_view_the_travel_page', "Access travel page"),
+            ('can_view_schedule_page', "Access schedule page"),
+        )
+
     def __str__(self):
         return self.user.name
 
 class Child(models.Model):
     user = models.OneToOneField(myUser, null = True, on_delete = models.CASCADE)
+
+    class Meta:
+        permissions = (
+            ('can_view_the_travel_page', "Access travel page"),
+        )
 
     def __str__(self):
         return self.user.name
@@ -83,6 +94,13 @@ class Measurement(models.Model):
     destination = models.CharField(max_length=200)
     distance = models.DecimalField(max_digits=10, decimal_places=2)
     created = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(null = True)
+    end_time = models.DateTimeField(null = True)
+
+    votes = models.ManyToManyField(User, related_name = 'trip_vote')
+
+    def total_votes(self):
+        return self.likes.count()
 
 
     def __str__(self):

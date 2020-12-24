@@ -22,7 +22,7 @@ from calendar import HTMLCalendar
 from .models import *
 from .forms import *
 from .utils import *
-from .group_check import group_required
+from .group_check import group_required, permission_required
 
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
@@ -97,9 +97,11 @@ def memoriesPage(request):
 @group_required('Parent', 'Child')
 def travelPage(request):
     return render(request, 'travel.html')
+        
 
 @login_required
 @group_required('Parent', 'Child', 'External')
+@permission_required('can_view_schedule_page')
 def schedulePage(request):
     return render(request, 'calendar_templates/schedule.html')
 
@@ -264,7 +266,7 @@ def calculate_distance_view(request):
         instance.distance = distance
         instance.save()
 
-        m.save(str(instance.id) + ".html")
+        #m.save(str(instance.id) + ".html")
         
     
     m = m._repr_html_()
@@ -276,7 +278,7 @@ def calculate_distance_view(request):
         'destination': destination,
         'form': form,
         'map': m,
-        'travels':travels
+        'travels':travels,
     }
 
     return render(request, 'travel_templates/travel_add.html', context)
@@ -291,6 +293,12 @@ def removeTravel(request, pk):
     context = {'travel':travel}
     return render(request, 'travel_templates/travel_delete.html', context)
 
+def VoteView(request, pk):
+    post = get_object_or_404(Measurement, id=request.POST.get('vote_button'))
+    post.votes.add(request.user)
+    return HttpResponseRedirect(reverse('travel'))
+
+
 ####################
 
 ##### calendar #####
@@ -298,7 +306,6 @@ def removeTravel(request, pk):
 class CalendarView(generic.ListView):
     model = Event
     template_name = 'calendar_templates/schedule.html'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 

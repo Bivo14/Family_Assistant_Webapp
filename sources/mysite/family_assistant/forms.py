@@ -34,7 +34,11 @@ class AddChildItemForm(forms.ModelForm):
 class MeasurementModelForm(forms.ModelForm):
     class Meta:
         model = Measurement
-        fields = ('location', 'destination',)
+        widgets = {
+          'start_time': DateInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
+          'end_time': DateInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
+        }
+        fields = ('location', 'destination', 'start_time', 'end_time')
 
 class EventForm(ModelForm):
   class Meta:
