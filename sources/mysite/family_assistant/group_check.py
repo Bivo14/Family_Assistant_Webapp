@@ -9,16 +9,4 @@ def group_required(*group_names):
        return False
    return user_passes_test(in_groups)
 
-def has_permission(self, perm, obj = None):
-    try:
-        user_perm = self.user_permissions.get(codename = perm)
-    except ObjectDoesNotExist:
-        user_perm = False
-    if user_perm:
-        return True
-    else:
-        return False
-
-def permission_required(*perms):
-    return user_passes_test(lambda u: any(u.has_perm(perm) for perm in perms), login_url = '/')
 

@@ -13,7 +13,6 @@ class UserForm(ModelForm):
 	class Meta:
 		model = myUser
 		fields = '__all__'
-		exclude = ['user']
 
 class CreateImageForm(forms.ModelForm):
     class Meta:

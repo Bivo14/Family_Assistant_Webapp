@@ -8,44 +8,23 @@ from django.dispatch import receiver
 from django.contrib.auth.models import Group
   
 class myUser(models.Model):
+
+    GROUPS = (
+        ('Parent', 'Parent'),
+        ('Child', 'Child'),
+        ('External', 'External'),
+    )
+
     user = models.OneToOneField(User, null = True, on_delete = models.CASCADE)
     name = models.CharField(max_length = 200, null = True)
     email = models.CharField(max_length = 200, null = True)
     phone = models.CharField(max_length = 200, null = True)
+    group = models.CharField(max_length = 200, null = True, choices = GROUPS)
     profile_picture = models.ImageField(default = "avatars/profile1.png", upload_to = 'avatars', null = True, blank = True)
     date_created = models.DateTimeField(auto_now_add = True, null = True)
 
     def __str__(self):
         return str(self.name)
-
-class Parent(models.Model):
-    user = models.OneToOneField(myUser, null = True, on_delete = models.CASCADE)
-
-    class Meta:
-        permissions = (
-            ('can_view_the_travel_page', "Access travel page"),
-            ('can_view_schedule_page', "Access schedule page"),
-        )
-
-    def __str__(self):
-        return self.user.name
-
-class Child(models.Model):
-    user = models.OneToOneField(myUser, null = True, on_delete = models.CASCADE)
-
-    class Meta:
-        permissions = (
-            ('can_view_the_travel_page', "Access travel page"),
-        )
-
-    def __str__(self):
-        return self.user.name
-
-class External(models.Model):
-    user = models.OneToOneField(myUser, null = True, on_delete = models.CASCADE)
-
-    def __str__(self):
-        return self.user.name
 
 class Image(models.Model):
     title = models.CharField(max_length = 200, null = True)

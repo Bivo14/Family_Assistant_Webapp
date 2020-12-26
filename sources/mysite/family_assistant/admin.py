@@ -4,9 +4,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import Permission
 
 # Register your models here.
-admin.site.register(Parent)
-admin.site.register(Child)
-admin.site.register(External)
 admin.site.register(myUser)
 admin.site.register(Image)
 admin.site.register(ImageComment)

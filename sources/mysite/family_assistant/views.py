@@ -22,7 +22,7 @@ from calendar import HTMLCalendar
 from .models import *
 from .forms import *
 from .utils import *
-from .group_check import group_required, permission_required
+from .group_check import group_required
 
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
@@ -62,7 +62,6 @@ def loginPage(request):
         context = {}
         return render(request, 'base_templates/login.html', context)
 
-
 def logoutUser(request):
     logout(request)
     return redirect('login')
@@ -73,9 +72,12 @@ def logoutUser(request):
 def accountSettings(request):
     get_user = request.user.myuser
     form = UserForm(instance = get_user)
+    form.fields['user'].widget = forms.HiddenInput()
     if request.method == 'POST':
         form = UserForm(request.POST, request.FILES, instance = get_user)
         if form.is_valid():
+            my_group = Group.objects.get(name = str(form['group'].value()))
+            my_group.user_set.add(form['user'].value())
             form.save()
     context = {'form':form, 'user':get_user}
     return render(request, 'base_templates/user_page.html', context)
@@ -101,7 +103,6 @@ def travelPage(request):
 
 @login_required
 @group_required('Parent', 'Child', 'External')
-@permission_required('can_view_schedule_page')
 def schedulePage(request):
     return render(request, 'calendar_templates/schedule.html')
 
@@ -188,7 +189,7 @@ def addPersonalEvent(request, pk):
     return render(request, 'lists_templates/add_personal_event.html', context)
 
 @login_required
-@group_required('Parent', 'Child')
+@group_required('Parent', 'Child', 'External')
 def viewPersonalEvents(request, pk):
     user_to_get = request.user
     get_user = myUser.objects.get(user = user_to_get)
@@ -196,7 +197,7 @@ def viewPersonalEvents(request, pk):
     return render(request, 'lists_templates/render_events.html', {'user':get_user, 'personal_events':items})
 
 @login_required
-@group_required('Parent', 'Child')
+@group_required('Parent', 'Child', 'External')
 def removePersonalEvent(request, pk):
     item = Personal_Event.objects.get(id = pk)
     if request.method == 'POST':
@@ -206,7 +207,7 @@ def removePersonalEvent(request, pk):
     return render(request, 'lists_templates/delete_personal_event.html', context)
         
 @login_required 
-@group_required('Parent', 'Child')
+@group_required('Parent', 'Child', 'External')
 def checkPersonalEvent(request, pk):
     post = get_object_or_404(Personal_Event, id=request.POST.get('tick_task'))
     if request.method == 'POST':
@@ -356,16 +357,22 @@ def removeTravel(request, pk):
     context = {'travel':travel}
     return render(request, 'travel_templates/travel_delete.html', context)
 
+@login_required
+@group_required('Parent', 'Child')
 def VoteView(request, pk):
     post = get_object_or_404(Measurement, id=request.POST.get('vote_button'))
     post.votes.add(request.user)
     return HttpResponseRedirect(reverse('travel'))
 
+@login_required
+@group_required('Parent', 'Child')
 def UnVoteView(request, pk):
     post = get_object_or_404(Measurement, id=request.POST.get('unvote_button'))
     post.votes.remove(request.user)
     return HttpResponseRedirect(reverse('travel'))
 
+@login_required
+@group_required('Parent')
 def approveTravel(request, pk):
     post = get_object_or_404(Measurement, id=request.POST.get('approve_button'))
     if request.method == 'POST':
@@ -425,7 +432,6 @@ def get_date(req_day):
 
 @login_required
 @group_required('Parent', 'Child', 'External')
-
 def event(request, event_id=None):
     instance = Event()
     if event_id:
