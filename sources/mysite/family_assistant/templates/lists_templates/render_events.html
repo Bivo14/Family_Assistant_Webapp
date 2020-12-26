@@ -4,13 +4,14 @@
 
 <div class="list-group">
 
-    {% for item in items %}
-      {% if item.owner.id == user.id %}
+    {% for item in personal_events %}
+      {% if item.person.id == user.id %}
         <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{item.name}}</h5>
+              <h5 class="mb-1">{{item.task}}</h5>
             </div>
             <p class="mb-1">{{item.description}}</p>
+            <p class="mb-1" style="font-weight: bold;"> {{item.start_time}} to {{item.end_time}}</p>
             <p class="mb-1" style="font-weight: bold;">{{item.category}}</p>
             
             {% if item.status == 'Task done' %}
@@ -19,12 +20,12 @@
             <div class="status" style="color:red; font-weight: bold;">Status: {{item.status}}</div>
             {% endif %}
 
-            <form action="{% url 'tick_item' item.id %}" method = "POST">
+            <form action="{% url 'tick_personal_event' item.id %}" method = "POST">
               {% csrf_token %}
-              <button type="submit", name="tick_button", value="{{item.id}}", class="btn btn-success btn-sm">Check item</button>
+              <button type="submit", name="tick_task", value="{{item.id}}", class="btn btn-success btn-sm">Check item</button>
             </form>
-
-            <a href="{% url 'delete_item' item.id %}" class = "btn btn-danger" role = "button" id = "delete-item">Delete Item</a>
+            
+            <a href="{% url 'delete_personal_events' item.id %}" class = "btn btn-danger" role = "button" id = "delete-item">Delete Item</a>
           </a>
       {% endif %}
     {% endfor %}

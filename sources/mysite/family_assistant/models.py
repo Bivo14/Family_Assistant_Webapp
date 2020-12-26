@@ -75,21 +75,49 @@ post_save.connect(create_profile, sender = User)
 
 class Child_Item(models.Model):
     CATEGORY = (
-        ('Book', 'Book'),
-        ('Movie', 'Movie'),
-        ('Toy', 'Toy'),
-        ('Clothes', 'Clothes'),
+        ('To read', 'To read'),
+        ('To watch', 'To watch'),
+        ('To buy', 'To buy'),
+        ('To do', 'To do'),
+    )
+
+    STATUS = (
+        ('Task done', 'Task done'),
+        ('Task not done yet', 'Task not done yet'),
     )
 
     owner = models.ForeignKey(myUser, null = True, default = None, on_delete = models.CASCADE)
     name = models.CharField(max_length = 200, null = True)
     description = models.CharField(max_length = 200, null = True)
     category = models.CharField(max_length = 200, null = True, choices = CATEGORY)
+    status = models.CharField(max_length = 200, null = True, choices = STATUS)
 
     def __str__(self):
         return self.name
 
+class Personal_Event(models.Model):
+    STATUS = (
+        ('Task done', 'Task done'),
+        ('Task not done yet', 'Task not done yet'),
+    )
+
+    person = models.ForeignKey(myUser, null = True, default = None, on_delete = models.CASCADE)
+    task = models.CharField(max_length = 200, null = True)
+    description = models.CharField(max_length = 200, null = True)
+    start_time = models.DateTimeField(null = True)
+    end_time = models.DateTimeField(null = True)
+    status = models.CharField(max_length = 200, null = True, choices = STATUS, default = 'Task not done yet')
+
+    def __str__(self):
+        return self.task
+
 class Measurement(models.Model):
+
+    CATEGORY = (
+        ('Approved', 'Approved'),
+        ('Awaiting approval', 'Awaiting approval'),
+    )
+
     location = models.CharField(max_length=200)
     destination = models.CharField(max_length=200)
     distance = models.DecimalField(max_digits=10, decimal_places=2)
@@ -98,6 +126,8 @@ class Measurement(models.Model):
     end_time = models.DateTimeField(null = True)
 
     votes = models.ManyToManyField(User, related_name = 'trip_vote')
+    status = models.CharField(max_length = 200, null = True, choices = CATEGORY, default = 'Awaiting approval')
+    
 
     def total_votes(self):
         return self.likes.count()

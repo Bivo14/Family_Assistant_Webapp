@@ -43,8 +43,10 @@
 				{{form|crispy}}
 		
 			<input class="btn btn-primary" type="submit" name="Update Information">
-			<a class="btn btn-warning" href="{% url 'viewLists' user.id %}"> View items</a>
-			<a class="btn btn-warning" href="{% url 'addChildItem' user.id %}"> Add item</a>
+			<a class="btn btn-warning" href="{% url 'viewLists' user.id %}"> View lists</a>
+			<a class="btn btn-warning" href="{% url 'addChildItem' user.id %}"> Add list</a>
+			<a class="btn btn-warning" href="{% url 'viewPersonalEvents' user.id %}"> View personal list</a>
+			<a class="btn btn-warning" href="{% url 'addPersonalEvent' user.id %}"> Add task</a>
 			</form>
 		</div>
 	</div>

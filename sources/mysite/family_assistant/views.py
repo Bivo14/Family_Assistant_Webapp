@@ -166,7 +166,57 @@ def addComment(request, pk):
 
 ####################
 
+@login_required
+@group_required('Parent', 'Child', 'External')
+def addPersonalEvent(request, pk):
+    user_to_get = request.user 
+    get_user = myUser.objects.get(user = user_to_get)
+    personal_events = Personal_Event.objects.all()
+    form = AddPersonalEventForm(request.POST)
+    if request.method == 'POST':
+        task = form['task'].value()
+        description = form['description'].value()
+        start_time = form['start_time'].value()
+        end_time = form['end_time'].value()
+        new_event = personal_events.create(person = get_user, task = task, description = description, start_time = start_time, end_time = end_time)
+        form = AddPersonalEventForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    personal_events = Personal_Event.objects.all()
+    context = {'form':form, 'personal_events':personal_events}
+    return render(request, 'lists_templates/add_personal_event.html', context)
 
+@login_required
+@group_required('Parent', 'Child')
+def viewPersonalEvents(request, pk):
+    user_to_get = request.user
+    get_user = myUser.objects.get(user = user_to_get)
+    items = Personal_Event.objects.all()
+    return render(request, 'lists_templates/render_events.html', {'user':get_user, 'personal_events':items})
+
+@login_required
+@group_required('Parent', 'Child')
+def removePersonalEvent(request, pk):
+    item = Personal_Event.objects.get(id = pk)
+    if request.method == 'POST':
+        item.delete()
+        return redirect('/')
+    context = {'personal_event':item}
+    return render(request, 'lists_templates/delete_personal_event.html', context)
+        
+@login_required 
+@group_required('Parent', 'Child')
+def checkPersonalEvent(request, pk):
+    post = get_object_or_404(Personal_Event, id=request.POST.get('tick_task'))
+    if request.method == 'POST':
+        if post.status != 'Task done':
+            post.status = 'Task done'
+            post.save()
+        else:
+            post.status = 'Task not done yet'
+            post.save()
+    return HttpResponseRedirect(reverse('viewPersonalEvents', args=[str(pk)]))  
 
 
 
@@ -209,6 +259,19 @@ def removeItem(request, pk):
         return redirect('/')
     context = {'item':item}
     return render(request, 'lists_templates/delete_item.html', context)
+
+@login_required 
+@group_required('Parent', 'Child')
+def checkItem(request, pk):
+    post = get_object_or_404(Child_Item, id=request.POST.get('tick_button'))
+    if request.method == 'POST':
+        if post.status != 'Task done':
+            post.status = 'Task done'
+            post.save()
+        else:
+            post.status = 'Task not done yet'
+            post.save()
+    return HttpResponseRedirect(reverse('viewLists', args=[str(pk)]))  
 
 ####################
 
@@ -297,6 +360,22 @@ def VoteView(request, pk):
     post = get_object_or_404(Measurement, id=request.POST.get('vote_button'))
     post.votes.add(request.user)
     return HttpResponseRedirect(reverse('travel'))
+
+def UnVoteView(request, pk):
+    post = get_object_or_404(Measurement, id=request.POST.get('unvote_button'))
+    post.votes.remove(request.user)
+    return HttpResponseRedirect(reverse('travel'))
+
+def approveTravel(request, pk):
+    post = get_object_or_404(Measurement, id=request.POST.get('approve_button'))
+    if request.method == 'POST':
+        if post.status != 'Approved':
+            post.status = 'Approved'
+            post.save()
+        else:
+            post.status = 'Awaiting approval'
+            post.save()
+    return HttpResponseRedirect(reverse('travel'))    
 
 
 ####################

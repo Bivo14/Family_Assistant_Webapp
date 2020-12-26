@@ -14,6 +14,10 @@ calculate distance
     display: flex;
     align-items: center;
   }
+
+  .buttons {
+    display:inline-block;
+  }
 </style>
 
 <!-- Modal -->
@@ -71,17 +75,41 @@ calculate distance
 
           <hr>
 
-          <form action="{% url 'vote_travel' travel.id %}" method = "POST">
-            {% csrf_token %}
-            <button type="submit", name="vote_button", value="{{travel.id}}", class="btn btn-primary btn-sm">Vote</button>
-            {{travel.votes.count}} vote(s)
-          </form>
+          <div class="buttons">
 
+            <form action="{% url 'vote_travel' travel.id %}" method = "POST">
+              {% csrf_token %}
+              <button type="submit", name="vote_button", value="{{travel.id}}", class="btn btn-primary btn-sm">Vote</button>
+              {{travel.votes.count}} vote(s)
+            </form>
+            
+            <br>
+
+            <form action="{% url 'unvote_travel' travel.id %}" method = "POST">
+              {% csrf_token %}
+              <button type="submit", name="unvote_button", value="{{travel.id}}", class="btn btn-primary btn-sm">Unvote</button>
+            </form>
+  
+            <br>
+
+            {% if travel.status == 'Approved' %}
+            <div class="status" style="color:green; font-weight: bold;">Status: {{travel.status}}</div>
+            {% else %}
+            <div class="status" style="color:red; font-weight: bold;">Status: {{travel.status}}</div>
+            {% endif %}
+
+          </div>
 
           {% if request.user.is_superuser %}
-            <a href="{% url 'delete_travel' travel.id %}" class = "btn btn-danger" role = "button" id = "delete-travel">Delete Item</a>
-          {% endif %}
+            <a href="{% url 'delete_travel' travel.id %}" class = "btn btn-danger btn-sm" role = "button" id = "delete-travel">Delete Item</a>
 
+            <form action="{% url 'approve_travel' travel.id %}" method = "POST">
+              {% csrf_token %}
+              <button type="submit", name="approve_button", value="{{travel.id}}", class="btn btn-success btn-sm">Approve</button>
+            </form>
+
+          {% endif %}
+          <br>
         </a>
   {% endfor %}
 </div>

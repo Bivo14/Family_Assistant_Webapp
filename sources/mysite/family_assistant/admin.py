@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Parent, Child, External, Image, myUser, ImageComment, Child_Item, Measurement, Event 
+from .models import *
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import Permission
 
@@ -14,6 +14,7 @@ admin.site.register(Child_Item)
 admin.site.register(Measurement)
 admin.site.register(Event)
 admin.site.register(Permission)
+admin.site.register(Personal_Event)
 
 
 
