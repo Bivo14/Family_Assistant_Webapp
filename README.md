@@ -1,4 +1,5 @@
 # Family Assistant Web Application
+Simple Django application which includes calendar and distance calculator
 
 ### Oveview
 The application servers as a mean for families to track their activities, plan family trips or just share some thoughts about trips from the past.
